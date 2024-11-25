@@ -766,26 +766,34 @@ class GPTResumeGenerator:
         self.job_description = result
 
     def set_job_description_from_text(self, job_description_text):
+        logger.debug("Генерация краткого описания вакансии")
         prompt = ChatPromptTemplate.from_template(strings.summarize_prompt_template)
         chain = prompt | self.llm_cheap | StrOutputParser()
         output = chain.invoke({"text": job_description_text})
+        logger.debug(f"Ответ от LLM: {output}")
+        logger.debug("Краткое описание вакансии сгенерировано")
         self.job_description = output
     
     def generate_header(self) -> str:
+        logger.debug("Генерация заголовка резюме")
         header_prompt_template = self._preprocess_template_string(
             strings.prompt_header
         )
         prompt = ChatPromptTemplate.from_template(header_prompt_template)
         chain = prompt | self.llm_cheap | StrOutputParser()
+        
         sex = self.resume.get("personal_information").get("sex")
         output = chain.invoke({
             "personal_information": self.resume["personal_information"],
             "job_description": self.job_description,
             "sex": sex
         })
+        logger.debug(f"Ответ от LLM: {output}")
+        logger.debug("Заголовок резюме сгенерирован")
         return output
 
     def generate_education_section(self) -> str:
+        logger.debug("Генерация раздела образования для резюме")
         education_prompt_template = self._preprocess_template_string(
             strings.prompt_education
         )
@@ -797,9 +805,12 @@ class GPTResumeGenerator:
             "job_description": self.job_description,
             "sex": sex
         })
+        logger.debug(f"Ответ от LLM: {output}")
+        logger.debug("Раздел образования сгенерирован")
         return output
 
     def generate_work_experience_section(self) -> str:
+        logger.debug("Генерация раздела опыта для резюме")
         work_experience_prompt_template = self._preprocess_template_string(
             strings.prompt_working_experience
         )
@@ -811,35 +822,41 @@ class GPTResumeGenerator:
             "job_description": self.job_description,
             "sex": sex
         })
+        logger.debug(f"Ответ от LLM: {output}")
+        logger.debug("Раздел опыта сгенерирован")
         return output
 
     def generate_side_projects_section(self) -> str:
+        logger.debug("Генерация раздела проектов для резюме")
+        
         side_projects_prompt_template = self._preprocess_template_string(
             strings.prompt_side_projects
         )
+        
         prompt = ChatPromptTemplate.from_template(side_projects_prompt_template)
+
         chain = prompt | self.llm_cheap | StrOutputParser()
         sex = self.resume.get("personal_information").get("sex")
+        
         output = chain.invoke({
             "projects": self.resume["projects"],
             "job_description": self.job_description,
             "sex": sex
         })
+        logger.debug(f"Ответ от LLM: {output}")
+        logger.debug("Раздел проектов сгенерирован")
         return output
 
     def generate_achievements_section(self) -> str:
-        logger.debug("Starting achievements section generation")
+        logger.debug("Генерация раздела достижений для резюме")
 
         achievements_prompt_template = self._preprocess_template_string(
             strings.prompt_achievements
         )
-        logger.debug(f"Achievements template: {achievements_prompt_template}")
 
         prompt = ChatPromptTemplate.from_template(achievements_prompt_template)
-        logger.debug(f"Prompt: {prompt}")
 
         chain = prompt | self.llm_cheap | StrOutputParser()
-        logger.debug(f"Chain created: {chain}")
         
         sex = self.resume.get("personal_information").get("sex")
         input_data = {
@@ -847,27 +864,22 @@ class GPTResumeGenerator:
             "job_description": self.job_description,
             "sex": sex
         }
-        logger.debug(f"Input data for the chain: {input_data}")
 
         output = chain.invoke(input_data)
-        logger.debug(f"Chain invocation result: {output}")
-
-        logger.debug("Achievements section generation completed")
+        logger.debug(f"Ответ от LLM: {output}")
+        logger.debug("Раздел достижений сгенерирован")
         return output
 
     def generate_certifications_section(self) -> str:
-        logger.debug("Starting Certifications section generation")
+        logger.debug("Генерация раздела сертификации для резюме")
 
         certifications_prompt_template = self._preprocess_template_string(
             strings.prompt_certifications
         )
-        logger.debug(f"Certifications template: {certifications_prompt_template}")
 
         prompt = ChatPromptTemplate.from_template(certifications_prompt_template)
-        logger.debug(f"Prompt: {prompt}")
 
         chain = prompt | self.llm_cheap | StrOutputParser()
-        logger.debug(f"Chain created: {chain}")
 
         sex = self.resume.get("personal_information").get("sex")
         input_data = {
@@ -875,22 +887,24 @@ class GPTResumeGenerator:
             "job_description": self.job_description,
             "sex": sex
         }
-        logger.debug(f"Input data for the chain: {input_data}")
 
         output = chain.invoke(input_data)
-        logger.debug(f"Chain invocation result: {output}")
-
-        logger.debug("Certifications section generation completed")
+        logger.debug(f"Ответ от LLM: {output}")
+        logger.debug("Раздел сертификации сгенерирован")
         return output
 
 
     def generate_additional_skills_section(self) -> str:
+        logger.debug("Генерация раздела навыков для резюме")
+        
         additional_skills_prompt_template = self._preprocess_template_string(
             strings.prompt_additional_skills
         )
         prompt = ChatPromptTemplate.from_template(additional_skills_prompt_template)
         chain = prompt | self.llm_cheap | StrOutputParser()
+        
         sex = self.resume.get("personal_information").get("sex")
+        
         output = chain.invoke({
             "languages": self.resume["languages"],
             "interests": self.resume["interests"],
@@ -898,6 +912,8 @@ class GPTResumeGenerator:
             "job_description": self.job_description,
             "sex": sex
         })
+        logger.debug(f"Ответ от LLM: {output}")
+        logger.debug("Раздел навыков сгенерирован")
         return output
 
 
