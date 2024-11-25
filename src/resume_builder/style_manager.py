@@ -29,9 +29,9 @@ class StyleManager:
                                 author_link = author_link.strip()
                                 styles_to_files[style_name] = (f, author_link)
         except FileNotFoundError:
-            logger.error(f"Directory {self.styles_directory} not found.")
+            logger.error(f"Папка {self.styles_directory} не найдена.")
         except PermissionError:
-            logger.error(f"Permission denied to access {self.styles_directory}.")
+            logger.error(f"Не прав на доступ к папке {self.styles_directory}.")
         return styles_to_files
 
     def format_choices(self, styles_to_files: Dict[str, Tuple[str, str]]) -> List[str]:

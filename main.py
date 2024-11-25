@@ -16,7 +16,7 @@ from src.resume_builder.resume import Resume
 from src.resume_builder.manager_facade import FacadeManager
 from src.resume_builder.resume_generator import ResumeGenerator
 from src.resume_builder.style_manager import StyleManager
-
+from src.app_config import RESUME_MODE
 
 log_file = "log/app_log.log"
 logger.add(log_file)
@@ -302,7 +302,8 @@ def create_and_run_bot(parameters, llm_api_key, resume):
         
     resume_object = Resume(resume)
     resume_generator_manager = FacadeManager(llm_api_key, style_manager, resume_generator, resume_object, Path("data_folder/output"))
-    resume_generator_manager.choose_style()      
+    if RESUME_MODE:
+        resume_generator_manager.choose_style()      
         
     driver = init_driver()
     login_component = Authenticator(driver)

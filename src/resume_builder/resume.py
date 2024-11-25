@@ -17,7 +17,6 @@ class Resume(BaseModel):
 
     def __init__(self, data: dict):
         try:
-            # Create an instance of Resume from the parsed data
             super().__init__(**data)
         except Exception as e:
-            raise Exception(f"Unexpected error while parsing YAML: {e}") from e
+            raise Exception(f"Неизвестная ошибка во время загрузки данных: {e}") from e

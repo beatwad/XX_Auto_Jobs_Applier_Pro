@@ -11,9 +11,6 @@ class TestPDFGeneration(unittest.TestCase):
 
     def setUp(self):
         # Load data from YAML files
-        with open('./yaml_example/config.yaml', 'r') as f:
-            self.config = yaml.safe_load(f)
-
         with open('./yaml_example/plain_text_resume.yaml', 'r') as f:
             self.plain_text_resume = yaml.safe_load(f)
 

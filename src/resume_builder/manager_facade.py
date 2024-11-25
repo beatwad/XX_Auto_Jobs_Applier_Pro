@@ -8,14 +8,14 @@ from loguru import logger
 
 class FacadeManager:
     def __init__(self, api_key, style_manager, resume_generator, resume_object, log_path):
-        # Ottieni il percorso assoluto della directory della libreria
+        # Получить полный путь к каталогу библиотеки
         lib_directory = Path(__file__).resolve().parent
         styles_directory = lib_directory / "resume_style"
         self.style_manager = style_manager
         self.style_manager.set_styles_directory(styles_directory)
         self.resume_generator = resume_generator
         self.resume_generator.set_resume_object(resume_object)
-        self.selected_style = None  # Proprietà per memorizzare lo stile selezionato
+        self.selected_style = None  # свойства для хранения выбранного стиля
 
     def prompt_user(self, choices: list[str], message: str) -> str:
         questions = [
@@ -40,13 +40,13 @@ class FacadeManager:
         if not styles:
             logger.warning("Нет доступных стилей")
             return None
-        final_style_choice = "Create your resume style in CSS"
+        final_style_choice = "Создать свой стиль в CSS"
         formatted_choices = self.style_manager.format_choices(styles)
         formatted_choices.append(final_style_choice)
-        selected_choice = self.prompt_user(formatted_choices, "Which style would you like to adopt?")
+        selected_choice = self.prompt_user(formatted_choices, "Какой стиль резюме вы бы хотели использовать?")
         if selected_choice == final_style_choice:
             tutorial_url = "https://github.com/feder-cr/lib_resume_builder_AIHawk/blob/main/how_to_contribute/web_designer.md"
-            logger.info("\nOpening tutorial in your browser...")
+            logger.info("\nОткрываем туториал в вашем браузере...")
             webbrowser.open(tutorial_url)
             exit()
         else:

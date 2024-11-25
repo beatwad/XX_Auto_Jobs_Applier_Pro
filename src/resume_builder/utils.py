@@ -8,7 +8,7 @@ import time
 from webdriver_manager.chrome import ChromeDriverManager
 
 def create_driver_selenium():
-    options = get_chrome_browser_options()  # Use the method to get Chrome options
+    options = get_chrome_browser_options()
 
     chrome_install = ChromeDriverManager().install()
     folder = os.path.dirname(chrome_install)
@@ -20,9 +20,9 @@ def create_driver_selenium():
     return webdriver.Chrome(service=service, options=options)
 
 def HTML_to_PDF(FilePath):
-    # Validazione e preparazione del percorso del file
+    # Проверка и подготовка пути к файлу
     if not os.path.isfile(FilePath):
-        raise FileNotFoundError(f"The specified file does not exist: {FilePath}")
+        raise FileNotFoundError(f"Файл не найден: {FilePath}")
     FilePath = f"file:///{os.path.abspath(FilePath).replace(os.sep, '/')}"
     driver = create_driver_selenium()
 
@@ -30,23 +30,23 @@ def HTML_to_PDF(FilePath):
         driver.get(FilePath)
         time.sleep(2)
         pdf_base64 = driver.execute_cdp_cmd("Page.printToPDF", {
-            "printBackground": True,         # Include lo sfondo nella stampa
-            "landscape": False,              # Stampa in verticale (False per ritratto)
-            "paperWidth": 8.27,              # Larghezza del foglio in pollici (A4)
-            "paperHeight": 11.69,            # Altezza del foglio in pollici (A4)
-            "marginTop": 0.8,                # Margine superiore in pollici (circa 2 cm)
-            "marginBottom": 0.8,             # Margine inferiore in pollici (circa 2 cm)
-            "marginLeft": 0.5,               # Margine sinistro in pollici (circa 2 cm)
-            "marginRight": 0.5,              # Margine destro in pollici (circa 2 cm)
-            "displayHeaderFooter": False,   # Non visualizzare intestazioni e piè di pagina
-            "preferCSSPageSize": True,       # Preferire le dimensioni della pagina CSS
+            "printBackground": True,          # Include lo sfondo nella stampa
+            "landscape": False,               # Stampa in verticale (False per ritratto)
+            "paperWidth": 8.27,               # Larghezza del foglio in pollici (A4)
+            "paperHeight": 11.69,             # Altezza del foglio in pollici (A4)
+            "marginTop": 0.8,                 # Margine superiore in pollici (circa 2 cm)
+            "marginBottom": 0.8,              # Margine inferiore in pollici (circa 2 cm)
+            "marginLeft": 0.5,                # Margine sinistro in pollici (circa 2 cm)
+            "marginRight": 0.5,               # Margine destro in pollici (circa 2 cm)
+            "displayHeaderFooter": False,     # Non visualizzare intestazioni e piè di pagina
+            "preferCSSPageSize": True,        # Preferire le dimensioni della pagina CSS
             "generateDocumentOutline": False, # Non generare un sommario del documento
-            "generateTaggedPDF": False,      # Non generare PDF taggato
-            "transferMode": "ReturnAsBase64" # Restituire il PDF come stringa base64
+            "generateTaggedPDF": False,       # Non generare PDF taggato
+            "transferMode": "ReturnAsBase64"  # Restituire il PDF come stringa base64
         })
         return pdf_base64['data']
     except WebDriverException as e:
-        raise RuntimeError(f"WebDriver exception occurred: {e}")
+        raise RuntimeError(f"Ошибка при работе WebDriver: {e}")
     finally:
         driver.quit()
 
