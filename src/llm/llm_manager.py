@@ -934,7 +934,7 @@ class GPTResumeGenerator:
 
         def additional_skills_fn():
             if (self.resume["experience_details"] or self.resume["education_details"] or
-                self.resume["languages"] or self.resume["interests"]) and self["job_description"]:
+                self.resume["languages"] or self.resume["interests"]) and self.job_description:
                 return self.generate_additional_skills_section()
             return ""
 

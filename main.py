@@ -12,7 +12,11 @@ from src.authenticator import Authenticator
 from src.bot_facade import BotFacade
 from src.job_manager import JobManager
 from loguru import logger
-from src.resume_builder import Resume, FacadeManager, ResumeGenerator, StyleManager
+from src.resume_builder.resume import Resume
+from src.resume_builder.manager_facade import FacadeManager
+from src.resume_builder.resume_generator import ResumeGenerator
+from src.resume_builder.style_manager import StyleManager
+
 
 log_file = "log/app_log.log"
 logger.add(log_file)

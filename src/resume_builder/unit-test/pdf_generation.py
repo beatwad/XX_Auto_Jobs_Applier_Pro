@@ -53,7 +53,7 @@ class TestPDFGeneration(unittest.TestCase):
         self.assertIsNotNone(pdf_base64)
 
         # Save the PDF to disk
-        folder_path = 'generated_cv'
+        folder_path = 'data_folder/generated_cv'
         os.makedirs(folder_path, exist_ok=True)
         file_path_pdf = os.path.join(folder_path, "CV_test.pdf")
         with open(file_path_pdf, "wb") as f:

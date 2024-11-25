@@ -3,13 +3,25 @@ import importlib
 from typing import Any
 from string import Template
 from typing import Any
-from src.resume_builder.gpt_resume import LLMResumer
-from src.resume_builder.gpt_resume_job_description import LLMResumeJobDescription
-from src.resume_builder.config import global_config
 
 class ResumeGenerator:
     def __init__(self):
-        pass
+        self.html_template = """
+                            <!DOCTYPE html>
+                            <html lang="en">
+                            <head>
+                                <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>Resume</title>
+                                <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&display=swap" rel="stylesheet" />
+                                <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&display=swap" rel="stylesheet" /> 
+                                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" /> 
+                                <link rel="stylesheet" href="$style_path">
+                            </head>
+                            $markdown
+                            </body>
+                            </html>
+                            """
     
     def set_resume_object(self, resume_object):
          self.resume_object = resume_object
@@ -19,7 +31,7 @@ class ResumeGenerator:
         self._create_resume(gpt_resume_generator, style_path, temp_html_path)
     
     def _create_resume(self, gpt_resume_generator: Any, style_path, temp_html_path):
-        template = Template(global_config.html_template)
+        template = Template(self.html_template)
         message = template.substitute(markdown=gpt_resume_generator.generate_html_resume(), style_path=style_path)
         with open(temp_html_path, 'w', encoding='utf-8') as temp_file:
             temp_file.write(message)

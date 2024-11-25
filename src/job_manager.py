@@ -483,7 +483,7 @@ class JobManager:
     def _write_and_upload_resume(self, job):
         # job_application = job_context.job_application
         logger.debug("Starting the process of creating and uploading resume.")
-        folder_path = 'generated_cv'
+        folder_path = 'data_folder/generated_cv'
 
         try:
             if not os.path.exists(folder_path):

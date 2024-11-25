@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 import tempfile
 import inquirer
-from src.resume_builder.config import global_config
 from src.resume_builder.utils import HTML_to_PDF
 import webbrowser
 from loguru import logger
@@ -11,14 +10,9 @@ class FacadeManager:
     def __init__(self, api_key, style_manager, resume_generator, resume_object, log_path):
         # Ottieni il percorso assoluto della directory della libreria
         lib_directory = Path(__file__).resolve().parent
-        global_config.STRINGS_MODULE_RESUME_PATH = lib_directory / "resume_prompt/main_prompt.py"
-        global_config.STRINGS_MODULE_RESUME_JOB_DESCRIPTION_PATH = lib_directory / "resume_prompt/job_description_prompt.py"
-        global_config.STRINGS_MODULE_NAME = "prompts"
-        global_config.STYLES_DIRECTORY = lib_directory / "resume_style"
-        global_config.LOG_OUTPUT_FILE_PATH = log_path
-        global_config.API_KEY = api_key
+        styles_directory = lib_directory / "resume_style"
         self.style_manager = style_manager
-        self.style_manager.set_styles_directory(global_config.STYLES_DIRECTORY)
+        self.style_manager.set_styles_directory(styles_directory)
         self.resume_generator = resume_generator
         self.resume_generator.set_resume_object(resume_object)
         self.selected_style = None  # Proprietà per memorizzare lo stile selezionato
