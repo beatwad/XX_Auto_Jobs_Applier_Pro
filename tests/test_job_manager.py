@@ -38,7 +38,8 @@ def test_start_applying(job_manager):
     job_manager.driver.find_element.assert_called()
 
 
-@patch("src.job_manager.DEBUG_MODE", new=False)
+@patch("src.job_manager.COVER_LETTER_MODE", new=False)
+@patch("src.job_manager.RESUME_MODE", new=False)
 def test_apply_job(job_manager):
     job_manager.gpt_answerer.write_cover_letter.return_value = "Sample cover letter"
     job_manager._handle_response_popup = Mock()
@@ -48,7 +49,8 @@ def test_apply_job(job_manager):
     # при втором вызове - пустой список
     job_manager.driver.find_elements.side_effect = [[Mock()], []]
 
-    job_manager.apply_job("Test Company", "Test Job")
+    job_manager.apply_job("Test Company", "Test Job", 
+                          {"title": "test_title", "company_name": "test_company_name"})
 
     job_manager._handle_response_popup.assert_called_once()
     job_manager._write_and_send_cover_letter.assert_called_once_with("Sample cover letter")

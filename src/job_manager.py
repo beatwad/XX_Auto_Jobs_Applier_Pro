@@ -19,7 +19,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from src.app_config import MONKEY_MODE, DEBUG_MODE, RESUME_MODE, MINIMUM_WAIT_TIME_SEC, APPLY_ONCE_AT_COMPANY, MAX_APPLIES_NUM
+from src.app_config import MONKEY_MODE, COVER_LETTER_MODE, RESUME_MODE, MINIMUM_WAIT_TIME_SEC, APPLY_ONCE_AT_COMPANY, MAX_APPLIES_NUM
 from loguru import logger
 
 
@@ -155,7 +155,7 @@ class JobManager:
                 logger.debug(f"Не нашли кнопку отклика, видимо вы уже откликались на вакансию {company_name}")
             else:
                 cover_letter_text = self.gpt_answerer.write_cover_letter()
-                if DEBUG_MODE:
+                if COVER_LETTER_MODE:
                     # если находимся в режиме отладки - не откликаемся на вакансии,
                     # только сохраняем сгенерированные сопроводительные письма в файл
                     pass
