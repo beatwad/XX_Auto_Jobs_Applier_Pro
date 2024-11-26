@@ -27,7 +27,7 @@ from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import TokenTextSplitter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-import src.llm.strings as strings
+import src.llm.prompts as prompts
 from loguru import logger
 
 from src.app_config import JOB_IS_INTERESTING_THRESH, LLM_MODEL_TYPE, LLM_MODEL, FIXED_COVER_LETTER, PRICE_DICT, TEMPERATURE
@@ -403,21 +403,21 @@ class GPTAnswerer:
         self.ai_adapter = AIAdapter(config, llm_api_key)
         self.llm_cheap = LoggerChatModel(self.ai_adapter)
         self.chains = {
-            "personal_information": self._create_chain(strings.personal_information_template),
-            "legal_authorization": self._create_chain(strings.legal_authorization_template),
-            "work_preferences": self._create_chain(strings.work_preferences_template),
-            "education_details": self._create_chain(strings.education_details_template),
-            "experience_details": self._create_chain(strings.experience_details_template),
-            "projects": self._create_chain(strings.projects_template),
-            "availability": self._create_chain(strings.availability_template),
-            "salary_expectations": self._create_chain(strings.salary_expectations_template),
-            "certifications": self._create_chain(strings.certifications_template),
-            "languages": self._create_chain(strings.languages_template),
-            "interests": self._create_chain(strings.interests_template),
-            "previous_job_details": self._create_chain(strings.previous_job_template),
-            "general_knowledge_questions": self._create_chain(strings.general_knowledge_template),
-            "cover_letter": self._create_chain(strings.coverletter_template),
-            "job_is_interesting": self._create_chain(strings.job_is_interesting),
+            "personal_information": self._create_chain(prompts.personal_information_template),
+            "legal_authorization": self._create_chain(prompts.legal_authorization_template),
+            "work_preferences": self._create_chain(prompts.work_preferences_template),
+            "education_details": self._create_chain(prompts.education_details_template),
+            "experience_details": self._create_chain(prompts.experience_details_template),
+            "projects": self._create_chain(prompts.projects_template),
+            "availability": self._create_chain(prompts.availability_template),
+            "salary_expectations": self._create_chain(prompts.salary_expectations_template),
+            "certifications": self._create_chain(prompts.certifications_template),
+            "languages": self._create_chain(prompts.languages_template),
+            "interests": self._create_chain(prompts.interests_template),
+            "previous_job_details": self._create_chain(prompts.previous_job_template),
+            "general_knowledge_questions": self._create_chain(prompts.general_knowledge_template),
+            "cover_letter": self._create_chain(prompts.coverletter_template),
+            "job_is_interesting": self._create_chain(prompts.job_is_interesting),
         }
 
     @property
@@ -465,10 +465,10 @@ class GPTAnswerer:
     def summarize_job_description(self, text: str) -> str:
         """Создаем краткое описание вакансии"""
         logger.debug(f"Создаем краткое описание вакансии: '{text}'")
-        strings.summarize_prompt_template = self._preprocess_template_string(
-            strings.summarize_prompt_template
+        prompts.summarize_prompt_template = self._preprocess_template_string(
+            prompts.summarize_prompt_template
         )
-        prompt = ChatPromptTemplate.from_template(strings.summarize_prompt_template)
+        prompt = ChatPromptTemplate.from_template(prompts.summarize_prompt_template)
         chain = prompt | self.llm_cheap | StrOutputParser()
         output = chain.invoke({"text": text})
         logger.debug(f"Сгенерировано краткое описание: {output}")
@@ -618,7 +618,7 @@ class GPTAnswerer:
         """
         logger.debug(f"Отвечаем на вопрос c выбором одного ответа: {question}")
         func_template = self._preprocess_template_string(
-            strings.options_template)
+            prompts.options_template)
         prompt = ChatPromptTemplate.from_template(func_template)
         chain = prompt | self.llm_cheap | StrOutputParser()
         output_str = chain.invoke(
@@ -635,7 +635,7 @@ class GPTAnswerer:
         """
         logger.debug(f"Отвечаем на вопрос c выбором одного или нескольких ответа: {question}")
         func_template = self._preprocess_template_string(
-            strings.many_options_template)
+            prompts.many_options_template)
         prompt = ChatPromptTemplate.from_template(func_template)
         chain = prompt | self.llm_cheap | StrOutputParser()
         output_str = chain.invoke(
@@ -689,7 +689,7 @@ class GPTAnswerer:
         или же берем и возвращаем готовое.
         """
         if FIXED_COVER_LETTER:
-            output = strings.fixed_cover_letter
+            output = prompts.fixed_cover_letter
             logger.debug(f"Берем готовое сопроводительное письмо '{output}'")
             return output
         chain = self.chains.get("cover_letter")
@@ -750,7 +750,7 @@ class GPTResumeGenerator:
         context_formatter = vectorstore.as_retriever() | format_docs
         question_passthrough = RunnablePassthrough()
         chain_job_descroption= prompt | self.llm_cheap | StrOutputParser()
-        summarize_prompt_template = self._preprocess_template_string(strings.summarize_prompt_template)
+        summarize_prompt_template = self._preprocess_template_string(prompts.summarize_prompt_template)
         prompt_summarize = ChatPromptTemplate.from_template(summarize_prompt_template)
         chain_summarize = prompt_summarize | self.llm_cheap | StrOutputParser()
         qa_chain = (
@@ -767,7 +767,7 @@ class GPTResumeGenerator:
 
     def set_job_description_from_text(self, job_description_text):
         logger.debug("Генерация краткого описания вакансии")
-        prompt = ChatPromptTemplate.from_template(strings.summarize_prompt_template)
+        prompt = ChatPromptTemplate.from_template(prompts.summarize_prompt_template)
         chain = prompt | self.llm_cheap | StrOutputParser()
         output = chain.invoke({"text": job_description_text})
         logger.debug(f"Ответ от LLM: {output}")
@@ -777,7 +777,7 @@ class GPTResumeGenerator:
     def generate_header(self) -> str:
         logger.debug("Генерация заголовка резюме")
         header_prompt_template = self._preprocess_template_string(
-            strings.prompt_header
+            prompts.prompt_header
         )
         prompt = ChatPromptTemplate.from_template(header_prompt_template)
         chain = prompt | self.llm_cheap | StrOutputParser()
@@ -795,7 +795,7 @@ class GPTResumeGenerator:
     def generate_education_section(self) -> str:
         logger.debug("Генерация раздела образования для резюме")
         education_prompt_template = self._preprocess_template_string(
-            strings.prompt_education
+            prompts.prompt_education
         )
         prompt = ChatPromptTemplate.from_template(education_prompt_template)
         chain = prompt | self.llm_cheap | StrOutputParser()
@@ -812,7 +812,7 @@ class GPTResumeGenerator:
     def generate_work_experience_section(self) -> str:
         logger.debug("Генерация раздела опыта для резюме")
         work_experience_prompt_template = self._preprocess_template_string(
-            strings.prompt_working_experience
+            prompts.prompt_working_experience
         )
         prompt = ChatPromptTemplate.from_template(work_experience_prompt_template)
         chain = prompt | self.llm_cheap | StrOutputParser()
@@ -830,7 +830,7 @@ class GPTResumeGenerator:
         logger.debug("Генерация раздела проектов для резюме")
         
         side_projects_prompt_template = self._preprocess_template_string(
-            strings.prompt_side_projects
+            prompts.prompt_side_projects
         )
         
         prompt = ChatPromptTemplate.from_template(side_projects_prompt_template)
@@ -851,7 +851,7 @@ class GPTResumeGenerator:
         logger.debug("Генерация раздела достижений для резюме")
 
         achievements_prompt_template = self._preprocess_template_string(
-            strings.prompt_achievements
+            prompts.prompt_achievements
         )
 
         prompt = ChatPromptTemplate.from_template(achievements_prompt_template)
@@ -874,7 +874,7 @@ class GPTResumeGenerator:
         logger.debug("Генерация раздела сертификации для резюме")
 
         certifications_prompt_template = self._preprocess_template_string(
-            strings.prompt_certifications
+            prompts.prompt_certifications
         )
 
         prompt = ChatPromptTemplate.from_template(certifications_prompt_template)
@@ -898,7 +898,7 @@ class GPTResumeGenerator:
         logger.debug("Генерация раздела навыков для резюме")
         
         additional_skills_prompt_template = self._preprocess_template_string(
-            strings.prompt_additional_skills
+            prompts.prompt_additional_skills
         )
         prompt = ChatPromptTemplate.from_template(additional_skills_prompt_template)
         chain = prompt | self.llm_cheap | StrOutputParser()

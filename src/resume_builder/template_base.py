@@ -33,7 +33,7 @@ prompt_education_template = """
     <div class="entry">
       <div class="entry-header">
           <span class="entry-name">[University Name]</span>
-          <span class="entry-location">[Location] </span>
+          <span class="entry-location">[Location]</span>
       </div>
       <div class="entry-details">
           <span class="entry-title">[Degree] in [Field of Study] | Grade: [Your Grade]</span>
@@ -57,11 +57,11 @@ prompt_working_experience_template = """
       </div>
       <div class="entry-details">
           <span class="entry-title">[Your Job Title]</span>
-          <span class="entry-year">[Start Date] – [End Date] </span>
+          <span class="entry-year">[Start Date] – [End Date]</span>
       </div>
       <ul class="compact-list">
           <li>[Describe your responsibilities and achievements in this role] </li>
-          <li>[Describe any key projects or technologies you worked with]  </li>
+          <li>[Describe any key projects or technologies you worked with]</li>
           <li>[Mention any notable accomplishments or results]</li>
       </ul>
     </div>
