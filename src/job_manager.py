@@ -34,6 +34,7 @@ class JobManager:
         self.page_num = 1
         logger.debug("JobManager успешно инициализирован")
 
+
     def set_parameters(self, parameters: Dict[str, Any]):
         """Установка параметрок поиска"""
         logger.debug("Установка параметров JobManager")
@@ -72,6 +73,7 @@ class JobManager:
         self.seen_answers = self._load_questions_from_json()
         logger.debug("Параметры успешно установлены") 
     
+
     def set_advanced_search_params(self) -> None:
         """Задать дополнительные параметры поиска в hh.ru"""
         self._enter_advanced_search_menu()
@@ -113,6 +115,7 @@ class JobManager:
         """
         self.gpt_answerer = gpt_answerer
     
+
     def set_resume_generator_manager(self, resume_generator_manager: Any, gpt_resume_generator: Any):
         """
         Задать менеджер для написания резюме
@@ -120,6 +123,7 @@ class JobManager:
         self.resume_generator_manager = resume_generator_manager
         self.gpt_resume_generator = gpt_resume_generator
     
+
     def start_applying(self) -> None:
         """Разослать отклики всем работодателям на всех страницах"""
         # продолжаем пока не достигнем максимально допустимого числа откликов
@@ -146,6 +150,7 @@ class JobManager:
                 continue
         logger.debug("Достигнуто максимально допустимое число откликов либо закончились вакансии. Завершаем работу.")
     
+
     def apply_job(self, company_name: str, job_title: str, job: dict) -> Tuple[str, str]:
         """Откликнусться на вакансию"""
         try:
@@ -155,6 +160,7 @@ class JobManager:
                 logger.debug(f"Не нашли кнопку отклика, видимо вы уже откликались на вакансию {company_name}")
             else:
                 cover_letter_text = self.gpt_answerer.write_cover_letter()
+                self._save_cover_letter(cover_letter_text)
                 if COVER_LETTER_MODE:
                     # если находимся в режиме отладки - не откликаемся на вакансии,
                     # только сохраняем сгенерированные сопроводительные письма в файл
@@ -189,6 +195,7 @@ class JobManager:
             return "Error", str(e)
         return "Success", ""
 
+
     def _scroll_slow(self, element: WebElement, time_to_scroll_sec: float = 1.5) -> int:
         """Медленно скроллить страницу, пока не дойдем до элемента"""
         current_position = self.driver.execute_script("""return window.pageYOffset;""")
@@ -218,6 +225,7 @@ class JobManager:
         time.sleep(0.5)
         return current_position
     
+
     def _send_repsonses(self) -> None:
         """Разослать отклики всем работодателям на странице"""
         employer_elements = ("xpath", "//*[starts-with(@data-qa, 'serp-item__title-text')]")
@@ -276,7 +284,8 @@ class JobManager:
             time_left = int(minimum_job_time - time.time())
             if time_left > 0:
                 self._sleep((time_left, time_left + 5))
-                
+
+     
     def _scrape_employer_page(self) -> Dict[str, str]:
         """
         Собрать всю информацию о работодателе со страницы
@@ -311,6 +320,7 @@ class JobManager:
         logger.debug("Информация со страницы работодателя успешно собрана")
         return job
 
+
     @staticmethod
     def _define_answers_output_file(filename: str) -> Path:
         """Определить путь к выходному файлу"""
@@ -323,6 +333,7 @@ class JobManager:
             raise
         return output_file
     
+
     def save_company(self, company_name: str, company_job_title: str, apply_result: Tuple[str, str]) -> None:
         """
         Определить, в какую категорию сохранять компанию и информацию о ней,
@@ -378,7 +389,8 @@ class JobManager:
             tb_str = traceback.format_exc()
             logger.error(f"Ошибка при сохранении информации о просмотренных компаниях в JSON файл")
             raise Exception(f"Ошибка при сохранении информации о просмотренных компаниях в JSON файл: \nTraceback:\n{tb_str}")
-        
+
+ 
     def _load_companies_from_json(self, filename: str) -> List[dict]:
         """Загрузить файл c уже просмотренными компаниями и их вакансиями"""
         output_file = self._define_answers_output_file(filename)
@@ -408,6 +420,7 @@ class JobManager:
             logger.error(f"Ошибка при загрузке информации о просмотренных компаниях в JSON файл")
             raise Exception(f"Ошибка при загрузке информации о просмотренных компаниях в JSON файл: \nTraceback:\n{tb_str}")
     
+
     def _save_questions_to_json(self, question_data: dict) -> None:
         """Сохранить вопрос в файл"""
         output_file = self._define_answers_output_file("answers.json")
@@ -421,6 +434,7 @@ class JobManager:
             logger.error(f"Ошибка при сохранении списка вопросов в JSON файл")
             raise Exception(f"Ошибка при сохранении списка вопросов в JSON файл: \nTraceback:\n{tb_str}")
         
+
     def _load_questions_from_json(self) -> List[dict]:
         """Загрузить файл с уже готовыми ответами на вопросы"""
         output_file = self._define_answers_output_file("answers.json")
@@ -444,6 +458,24 @@ class JobManager:
             logger.error(f"Ошибка при загрузке списка вопросов из JSON файла")
             raise Exception(f"Ошибка при загрузке списка вопросов из JSON файла: \nTraceback:\n{tb_str}")
     
+    
+    def _save_cover_letter(self, cover_letter_text: str) -> None:
+        """Сохранить вопрос в файл"""
+        job_link = self.driver.current_url
+        output_file = self._define_answers_output_file("cover_letters.txt")
+        logger.debug(f"Сохраняем новый сопроводительное письмо в текстовый файл")
+        try:
+            with open(output_file, 'w', encoding="utf-8") as f:
+                f.write(80 * "=" + "\n")
+                f.write(f"Ссылка: {job_link}\n")
+                f.write(cover_letter_text + "\n")
+            logger.debug("Новое вопрос сопроводительное письмо успешно сохранено в текстовый файл")
+        except Exception:
+            tb_str = traceback.format_exc()
+            logger.error(f"Ошибка при сохранении сопроводительного письма в текстовый файл")
+            raise Exception(f"Ошибка при сохранении сопроводительного письма в текстовый файл: \nTraceback:\n{tb_str}")
+
+
     def _handle_response_popup(self, scroll: bool = False) -> None:
         """Выбираем нужное резюме"""
         if self.driver.find_elements("xpath", "//*[@class='vacancy-response-popup-resume-list']"):
@@ -457,6 +489,7 @@ class JobManager:
                     if not scroll:
                         self.driver.find_element("xpath", "//*[@data-qa='vacancy-response-submit-popup']").click()
     
+
     def _find_and_handle_questions(self) -> Tuple[bool, str]:
         """Если на странице есть вопросы - использовать LLM для ответа на них"""
         question_element = ("xpath", "//*[@data-qa='task-body']")
@@ -479,6 +512,7 @@ class JobManager:
             self._pause()
             self._handle_response_popup(scroll=True)
         return True, ""
+
 
     def _write_and_upload_resume(self, job):
         # job_application = job_context.job_application
@@ -560,6 +594,7 @@ class JobManager:
             logger.error(f"Resume upload failed: {tb_str}")
             raise Exception(f"Upload failed: \nTraceback:\n{tb_str}")
     
+
     def _write_and_send_cover_letter(self, cover_letter_text: str) -> None:
         """Написать и отправить работодателю сопроводительное письмо"""
         cover_letter_field = self.driver.find_elements("xpath", "//*[@data-qa='vacancy-response-popup-form-letter-input']")
@@ -628,6 +663,7 @@ class JobManager:
                         break
                 self.driver.switch_to.default_content()
                 
+
     def _handle_question(self, question: WebElement) -> Tuple[bool, str]:
         """
         Метод для определения типа вопроса и выбора соответствующего 
@@ -653,6 +689,7 @@ class JobManager:
         logger.warning(output)
         return False, output
     
+
     def _handle_radio_question(self, question: WebElement, radio_fields: List[WebElement]) -> Tuple[bool, str]:
         """Метод для ответа на вопрос с возможностью выбора одной опции"""
         self._scroll_slow(question)
@@ -730,6 +767,7 @@ class JobManager:
         logger.debug("Ответ введен в textbox")
         return True, ""
     
+
     def _is_blacklisted(self, company: str) -> bool:
         """Проверить, не находится ли компания в черном списке"""
         if company in self.job_blacklist:
@@ -737,6 +775,7 @@ class JobManager:
             return True
         return False
     
+
     def _is_already_applied_to_job_or_company(self, company: str, job: str) -> Tuple[bool, str]:
         """Проверить, откликались ли мы уже на эту вакансию"""
         my_companies = self.succes_companies[self.login][self.job_title]
@@ -752,11 +791,13 @@ class JobManager:
                         return True, "Вакансия уже встречалась"
         return False, ""
     
+
     def _enter_text(self, element: WebElement, text: str) -> None:
         logger.debug(f"Вводим текст: {text}")
         element.clear()
         element.send_keys(text)
     
+
     @staticmethod
     def _pause(low: int = 1, high: int = 2) -> None:
         """
@@ -766,6 +807,7 @@ class JobManager:
         """
         pause = round(random.uniform(low, high), 1)
         time.sleep(pause)
+
 
     @staticmethod
     def _sleep(sleep_interval: Tuple[int, int]) -> None:
@@ -784,11 +826,13 @@ class JobManager:
         else:
             logger.debug(f"Ожидание продлилось {time_to_wait}.")
     
+
     def _find_by_text_and_click(self, text: str) -> None:
         """Функция для поиска элемента по тексту и клика по нему"""
         element = self.driver.find_element("xpath", f'//*[text()="{text}"]')
         self._scroll_slow(element)
         element.click()
+
 
     def _find_by_data_qa_and_click(self, text: str) -> None:
         """Функция для поиска элемента по тексту и клика по нему"""
@@ -796,6 +840,7 @@ class JobManager:
         self._scroll_slow(element)
         element.click()
     
+
     def _enter_advanced_search_menu(self) -> None:
         """Зайти на страницу с резюме, выбрать нужное и перейти через него к поиску вакансий"""
         logger.debug(f"Выбираем нужное резюме с именем `{self.job_title}`")
@@ -835,6 +880,7 @@ class JobManager:
                 self._click_button(element)
                 break
     
+
     def _set_key_words(self) -> None:
         """Задать ключевые слова"""
         if self.keywords:
@@ -842,6 +888,7 @@ class JobManager:
             self._enter_text(keywords_field, ', '.join(self.keywords))
             self._pause()
             keywords_field.send_keys(Keys.TAB)
+
 
     def _set_search_only(self) -> None:
         """Искать только"""
@@ -854,6 +901,7 @@ class JobManager:
             if self.search_only[s_o] is True:
                 self._find_by_text_and_click(search_only_dict[s_o])
 
+
     def _set_words_to_exclude(self) -> None:
         """Исключить слова"""    
         if not self.words_to_exclude:
@@ -861,6 +909,7 @@ class JobManager:
         words_to_exclude_element = self.driver.find_element("xpath", "//*[@data-qa='vacancysearch__keywords-excluded-input']")
         self._scroll_slow(words_to_exclude_element)
         self._enter_text(words_to_exclude_element, ', '.join(self.words_to_exclude))
+
 
     def _set_specialization(self) -> None:   
         """Задать специализацию"""
@@ -886,6 +935,7 @@ class JobManager:
         else:
             self.driver.find_element("xpath", "//*[@data-qa='bloko-modal-close']").click()
 
+
     def _set_industry(self) -> None:   
         """Задать oтрасль компании"""
         if not self.industry:
@@ -910,6 +960,7 @@ class JobManager:
         else:
             self.driver.find_element("xpath", "//*[@data-qa='bloko-modal-close']").click() 
 
+
     def _set_region(self) -> None:   
         """Задать регион"""
         region_element = self.driver.find_element("xpath",f"//*[@data-qa='advanced-search-region-add']")
@@ -918,6 +969,7 @@ class JobManager:
             self._pause()
             region_element.send_keys(Keys.TAB)
             self._pause()
+
 
     def _set_district(self) -> None:   
         """Задать район (если есть на странице)"""
@@ -931,7 +983,8 @@ class JobManager:
                 self._pause()
                 district_element.send_keys(Keys.TAB)
                 self._pause()
-                
+
+
     def _set_subway(self) -> None:   
         """Задать метро (если есть на странице)"""
         try:
@@ -945,11 +998,13 @@ class JobManager:
                 subway_element.send_keys(Keys.TAB)
                 self._pause()
 
+
     def _set_income(self) -> None:   
         """Задать уровень дохода"""
         if self.income > 0:
             income_element = self.driver.find_element("xpath", "//*[@data-qa='advanced-search-salary']")
             self._enter_text(income_element, self.income)
+
 
     def _set_education(self) -> None:   
         """Задать образование"""    
@@ -960,6 +1015,7 @@ class JobManager:
         }
         for edu in self.education:
             self._find_by_data_qa_and_click(education_dict[edu])
+
 
     def _set_experience(self) -> None:       
         """Задать требуемый опыт работы"""
@@ -974,6 +1030,7 @@ class JobManager:
             if self.experience[exp] is True:
                 self._find_by_data_qa_and_click(experience_dict[exp])
                 break
+
 
     def _set_job_type(self) -> None:       
         """Задать тип занятости"""  
@@ -999,6 +1056,7 @@ class JobManager:
             else:
                 self._find_by_data_qa_and_click(job_type_dict[j_t])
 
+
     def _set_work_schedule(self) -> None:
         """Задать график работы"""     
         work_schedule_dict = {
@@ -1013,6 +1071,7 @@ class JobManager:
             if self.work_schedule[w_s] is True:
                 self._find_by_data_qa_and_click(work_schedule_dict[w_s])
 
+
     def _set_side_job(self) -> None:
         """Подработка"""
         side_job_dict = {
@@ -1025,6 +1084,7 @@ class JobManager:
         for s_j in self.side_job:
             if self.side_job[s_j] is True:
                 self._find_by_data_qa_and_click(side_job_dict[s_j])
+
 
     def _set_other_params(self) -> None:
         """Задать другие параметры"""
@@ -1040,6 +1100,7 @@ class JobManager:
             if self.other_params[o_p] is True:
                 self._find_by_data_qa_and_click(other_params_dict[o_p])
 
+
     def _set_sort_by(self) -> None:
         """Сортировка"""
         sort_by_dict = {
@@ -1052,6 +1113,7 @@ class JobManager:
             if self.sort_by[s_b] is True:
                 self._find_by_data_qa_and_click(sort_by_dict[s_b])
                 break
+
 
     def _set_output_period(self) -> None:    
         """Выводить за"""
@@ -1067,6 +1129,7 @@ class JobManager:
                 self._find_by_data_qa_and_click(output_period_dict[o_p])
                 break
         
+
     def _set_output_size(self) -> None:    
         """Показывать на странице"""
         output_size_dict = {
@@ -1079,16 +1142,19 @@ class JobManager:
                 self._find_by_data_qa_and_click(output_size_dict[o_s])
                 break
 
+
     def _click_button(self, element) -> None:
         """Перейти по ссылке, на которую ведет кнопка"""
         url = element.get_attribute("href")
         self.driver.get(url)
-    
+
+
     def _start_search(self) -> None:
         """Начать поиск"""
         search_button = self.driver.find_element("xpath", "//*[@data-qa='advanced-search-submit-button']")
         search_button.click()
         logger.debug("Начинаем поиск вакансий")
+
 
     def _sanitize_text(self, text: str) -> str:
         """Очистить текст вопроса/ответа"""
