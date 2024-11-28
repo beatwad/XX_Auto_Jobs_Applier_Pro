@@ -160,7 +160,7 @@ class JobManager:
                 logger.debug(f"Не нашли кнопку отклика, видимо вы уже откликались на вакансию {company_name}")
             else:
                 cover_letter_text = self.gpt_answerer.write_cover_letter()
-                self._save_cover_letter(cover_letter_text)
+                self._save_cover_letter(company_name, cover_letter_text)
                 if COVER_LETTER_MODE:
                     # если находимся в режиме отладки - не откликаемся на вакансии,
                     # только сохраняем сгенерированные сопроводительные письма в файл
@@ -459,16 +459,18 @@ class JobManager:
             raise Exception(f"Ошибка при загрузке списка вопросов из JSON файла: \nTraceback:\n{tb_str}")
     
     
-    def _save_cover_letter(self, cover_letter_text: str) -> None:
+    def _save_cover_letter(self, company_name: str, cover_letter_text: str) -> None:
         """Сохранить вопрос в файл"""
         job_link = self.driver.current_url
         output_file = self._define_answers_output_file("cover_letters.txt")
         logger.debug(f"Сохраняем новый сопроводительное письмо в текстовый файл")
         try:
-            with open(output_file, 'w', encoding="utf-8") as f:
+            with open(output_file, 'a', encoding="utf-8") as f:
                 f.write(80 * "=" + "\n")
+                f.write(f"Компания: {company_name}\n")
                 f.write(f"Ссылка: {job_link}\n")
-                f.write(cover_letter_text + "\n")
+                f.write(f"Сопроводительное письмо:\n\n")
+                f.write(cover_letter_text + "\n\n")
             logger.debug("Новое вопрос сопроводительное письмо успешно сохранено в текстовый файл")
         except Exception:
             tb_str = traceback.format_exc()
