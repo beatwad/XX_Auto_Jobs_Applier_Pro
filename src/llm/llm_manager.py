@@ -707,13 +707,15 @@ class GPTResumeGenerator:
 
     @staticmethod
     def _preprocess_template_string(template: str) -> str:
-        # Preprocess a template string to remove unnecessary indentation.
+        """Предобработка строки с целью убрать лишние отступы"""
         return textwrap.dedent(template)
 
     def set_resume(self, resume):
+        """Добавляем резюме для анализа."""
         self.resume = resume
 
     def set_job_description_from_url(self, url_job_description):
+        """Получаем описание работы из URL"""
         from src.resume_builder.utils import create_driver_selenium
         driver = create_driver_selenium()
         driver.get(url_job_description)
@@ -766,6 +768,7 @@ class GPTResumeGenerator:
         self.job_description = result
 
     def set_job_description_from_text(self, job_description_text):
+        """Резюмируем описание вакансии"""
         logger.debug("Генерация краткого описания вакансии")
         prompt = ChatPromptTemplate.from_template(prompts.summarize_prompt_template)
         chain = prompt | self.llm_cheap | StrOutputParser()
@@ -775,6 +778,7 @@ class GPTResumeGenerator:
         self.job_description = output
     
     def generate_header(self) -> str:
+        """Генерация заголовка резюме"""
         logger.debug("Генерация заголовка резюме")
         header_prompt_template = self._preprocess_template_string(
             prompts.prompt_header
@@ -793,6 +797,7 @@ class GPTResumeGenerator:
         return output
 
     def generate_education_section(self) -> str:
+        """Генерация раздела образования для резюме"""
         logger.debug("Генерация раздела образования для резюме")
         education_prompt_template = self._preprocess_template_string(
             prompts.prompt_education
@@ -810,6 +815,7 @@ class GPTResumeGenerator:
         return output
 
     def generate_work_experience_section(self) -> str:
+        """Генерация раздела опыта для резюме"""
         logger.debug("Генерация раздела опыта для резюме")
         work_experience_prompt_template = self._preprocess_template_string(
             prompts.prompt_working_experience
@@ -827,6 +833,7 @@ class GPTResumeGenerator:
         return output
 
     def generate_side_projects_section(self) -> str:
+        """Генерация раздела проектов для резюме"""
         logger.debug("Генерация раздела проектов для резюме")
         
         side_projects_prompt_template = self._preprocess_template_string(
@@ -848,6 +855,7 @@ class GPTResumeGenerator:
         return output
 
     def generate_achievements_section(self) -> str:
+        """Генерация раздела достижений для резюме"""
         logger.debug("Генерация раздела достижений для резюме")
 
         achievements_prompt_template = self._preprocess_template_string(
@@ -871,6 +879,7 @@ class GPTResumeGenerator:
         return output
 
     def generate_certifications_section(self) -> str:
+        """Генерация раздела сертификации для резюме"""
         logger.debug("Генерация раздела сертификации для резюме")
 
         certifications_prompt_template = self._preprocess_template_string(
@@ -895,6 +904,7 @@ class GPTResumeGenerator:
 
 
     def generate_additional_skills_section(self) -> str:
+        """Генерация раздела навыков для резюме"""
         logger.debug("Генерация раздела навыков для резюме")
         
         additional_skills_prompt_template = self._preprocess_template_string(
@@ -918,6 +928,7 @@ class GPTResumeGenerator:
 
 
     def generate_html_resume(self) -> str:
+        """Создание резюме из сгенерированных компонентов"""
         def header_fn():
             if self.resume["personal_information"] and self.job_description:
                 return self.generate_header()

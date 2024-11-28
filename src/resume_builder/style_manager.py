@@ -5,14 +5,16 @@ from pathlib import Path
 from loguru import logger
 
 class StyleManager:
-    
+    """Класс управления стилями резюме"""
     def __init__(self):
         self.styles_directory = None
 
     def set_styles_directory(self, styles_directory: Path):
+        """Задаем папку, в которой хранятся стили резюме"""
         self.styles_directory = styles_directory
 
     def get_styles(self) -> Dict[str, Tuple[str, str]]:
+        """Получаем список стилей"""
         styles_to_files = {}
         try:
             files = os.listdir(self.styles_directory)
@@ -35,9 +37,11 @@ class StyleManager:
         return styles_to_files
 
     def format_choices(self, styles_to_files: Dict[str, Tuple[str, str]]) -> List[str]:
+        """Создаем список стилей резюме для выбора"""
         return [f"{style_name} (style author -> {author_link})" for style_name, (file_name, author_link) in styles_to_files.items()]
 
     def get_style_path(self, selected_style: str) -> Path:
+        """Получаем путь к стилю"""
         styles = self.get_styles()
         file_name, _ = styles[selected_style]
         return self.styles_directory / file_name

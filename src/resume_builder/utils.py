@@ -8,7 +8,8 @@ import time
 from webdriver_manager.chrome import ChromeDriverManager
 
 def create_driver_selenium():
-    options = get_chrome_browser_options()
+    """Создание Selenium driver"""
+    options = chrome_browser_options()
 
     chrome_install = ChromeDriverManager().install()
     folder = os.path.dirname(chrome_install)
@@ -20,7 +21,7 @@ def create_driver_selenium():
     return webdriver.Chrome(service=service, options=options)
 
 def HTML_to_PDF(FilePath):
-    # Проверка и подготовка пути к файлу
+    """Проверка и подготовка пути к файлу"""
     if not os.path.isfile(FilePath):
         raise FileNotFoundError(f"Файл не найден: {FilePath}")
     FilePath = f"file:///{os.path.abspath(FilePath).replace(os.sep, '/')}"
@@ -50,7 +51,8 @@ def HTML_to_PDF(FilePath):
     finally:
         driver.quit()
 
-def get_chrome_browser_options():
+def chrome_browser_options():
+    """Задать настройки браузера Chrome, в котором будет работать Selenium"""
     options = webdriver.ChromeOptions()
     options.add_argument("--start-maximized")  # Avvia il browser a schermo intero
     options.add_argument("--no-sandbox")  # Disabilita la sandboxing per migliorare le prestazioni

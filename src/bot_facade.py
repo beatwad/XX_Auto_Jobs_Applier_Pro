@@ -4,6 +4,7 @@ from loguru import logger
 
 
 class BotState:
+    """Класс состояний BotFacade"""
     def __init__(self):
         logger.debug("Инициализируем класс BotState")
         self.reset()

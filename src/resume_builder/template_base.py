@@ -1,3 +1,5 @@
+"""HTML шаблоны для создания разделов резюме"""
+
 prompt_header_template = """
 - **HTML Template to Use**
 ```

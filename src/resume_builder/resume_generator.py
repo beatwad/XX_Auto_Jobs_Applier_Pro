@@ -1,11 +1,11 @@
-import sys
-import importlib
 from typing import Any
 from string import Template
 from typing import Any
 
 class ResumeGenerator:
+    """Класс для генерации резюме"""
     def __init__(self):
+        
         self.html_template = """
                             <!DOCTYPE html>
                             <html lang="en">
@@ -24,22 +24,17 @@ class ResumeGenerator:
                             """
     
     def set_resume_object(self, resume_object):
-         self.resume_object = resume_object
+        """Задаем модель резюме"""
+        self.resume_object = resume_object
 
     def create_resume(self, gpt_resume_generator: Any, style_path: str, job_description_text: str, temp_html_path):
+        """Генерация резюме"""
         gpt_resume_generator.set_job_description_from_text(job_description_text)
         self._create_resume(gpt_resume_generator, style_path, temp_html_path)
     
     def _create_resume(self, gpt_resume_generator: Any, style_path, temp_html_path):
+        """Вспомогательный метод для генерации резюме"""
         template = Template(self.html_template)
         message = template.substitute(markdown=gpt_resume_generator.generate_html_resume(), style_path=style_path)
         with open(temp_html_path, 'w', encoding='utf-8') as temp_file:
             temp_file.write(message)
-
-
-def load_module(module_path: str, module_name: str):
-    spec = importlib.util.spec_from_file_location(module_name, module_path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[module_name] = module
-    spec.loader.exec_module(module)
-    return module

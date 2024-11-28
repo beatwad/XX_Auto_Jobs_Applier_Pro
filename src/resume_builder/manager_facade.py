@@ -7,6 +7,7 @@ import webbrowser
 from loguru import logger
 
 class FacadeManager:
+    """Класс интерфейса с генератором резюме"""
     def __init__(self, api_key, style_manager, resume_generator, resume_object, log_path):
         # Получить полный путь к каталогу библиотеки
         lib_directory = Path(__file__).resolve().parent
@@ -17,25 +18,8 @@ class FacadeManager:
         self.resume_generator.set_resume_object(resume_object)
         self.selected_style = None  # свойства для хранения выбранного стиля
 
-    def prompt_user(self, choices: list[str], message: str) -> str:
-        questions = [
-            inquirer.List('selection', message=message, choices=choices),
-        ]
-        return inquirer.prompt(questions)['selection']
-
-    def prompt_for_url(self, message: str) -> str:
-        questions = [
-            inquirer.Text('url', message=message),
-        ]
-        return inquirer.prompt(questions)['url']
-
-    def prompt_for_text(self, message: str) -> str:
-        questions = [
-            inquirer.Text('text', message=message),
-        ]
-        return inquirer.prompt(questions)['text']
-
     def choose_style(self):
+        """Выбор стиля резюме"""
         styles = self.style_manager.get_styles()
         if not styles:
             logger.warning("Нет доступных стилей")
@@ -54,6 +38,7 @@ class FacadeManager:
 
 
     def pdf_base64(self, gpt_resume_generator, job_description_text):
+        """Создание PDF файла из сгенерированного HTML шаблона"""
         if self.selected_style is None:
             raise ValueError("Перед созданием PDF-файла необходимо выбрать стиль.")
         

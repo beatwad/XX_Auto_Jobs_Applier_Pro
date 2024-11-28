@@ -1,9 +1,9 @@
 from typing import List, Dict, Optional
-import yaml
 from pydantic import BaseModel
 
 
 class Resume(BaseModel):
+    """Класс для хранения информации о резюме"""
     personal_information: Dict
     work_preferences: Dict
     education_details: Optional[List] = None
