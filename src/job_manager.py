@@ -517,9 +517,12 @@ class JobManager:
 
 
     def _write_and_upload_resume(self, job):
-        # job_application = job_context.job_application
+        """Метод для создания резюме и сохранения его в файл"""
+        company_name = job["company_name"]
+        job_title = job["title"]
+        job_link = self.driver.current_url
         logger.debug("Starting the process of creating and uploading resume.")
-        folder_path = 'data_folder/generated_cv'
+        folder_path = f'data_folder/generated_cv/{company_name}'
 
         try:
             if not os.path.exists(folder_path):
@@ -529,12 +532,15 @@ class JobManager:
             logger.error(f"Ошибка при создании директории: {folder_path}. Error: {e}")
             raise
 
+        # сохраняем ссылку на вакансию в отдельный файл
+        with open(folder_path + f"/{job_title}_link.txt", "w") as f:
+            f.write(job_link)
+        
         while True:
             try:
-                timestamp = int(time.time())
-                file_path_pdf = os.path.join(folder_path, f"CV_{timestamp}.pdf")
+                file_path_pdf = os.path.join(folder_path, f"CV_{company_name}_{job_title}.pdf")
                 logger.debug(f"Generated file path for resume: {file_path_pdf}")
-                logger.debug(f"Generating resume for job: {job['title']} at {job['company_name']}")
+                logger.debug(f"Generating resume for job: {job_title} at {job['company_name']}")
                 resume_pdf_base64 = self.resume_generator_manager.pdf_base64(self.gpt_resume_generator, job)
                 with open(file_path_pdf, "xb") as f:
                     f.write(base64.b64decode(resume_pdf_base64))

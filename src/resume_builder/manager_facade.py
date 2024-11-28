@@ -18,6 +18,12 @@ class FacadeManager:
         self.resume_generator.set_resume_object(resume_object)
         self.selected_style = None  # свойства для хранения выбранного стиля
 
+    def prompt_user(self, choices: list[str], message: str) -> str:
+        questions = [
+            inquirer.List('selection', message=message, choices=choices),
+        ]
+        return inquirer.prompt(questions)['selection']
+    
     def choose_style(self):
         """Выбор стиля резюме"""
         styles = self.style_manager.get_styles()
