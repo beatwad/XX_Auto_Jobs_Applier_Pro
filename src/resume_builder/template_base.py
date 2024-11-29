@@ -1,7 +1,7 @@
 """HTML шаблоны для создания разделов резюме"""
 
 prompt_header_template = """
-- **HTML Template to Use**
+- **HTML Шаблон**
 ```
 <header>
   <h1>[Name and Surname]</h1>
@@ -28,7 +28,7 @@ The results should be provided in html format, Provide only the html code for th
 """
 
 prompt_education_template = """
-- **HTML Template to Use**
+- **HTML Шаблон**
 ```
 <section id="education">
     <h2>Образование</h2>
@@ -48,7 +48,7 @@ The results should be provided in html format, Provide only the html code for th
 
 
 prompt_working_experience_template = """
-- **HTML Template to Use**
+- **HTML Шаблон**
 ```
 <section id="work-experience">
     <h2>Опыт работы</h2>
@@ -103,7 +103,7 @@ The results should be provided in html format, Provide only the html code for th
 
 
 prompt_side_projects_template = """
-- **HTML Template to Use**
+- **HTML Шаблон**
 ```
 <section id="side-projects">
     <h2>Проекты</h2>
@@ -141,7 +141,7 @@ The results should be provided in html format, Provide only the html code for th
 
 
 prompt_achievements_template = """
-- **HTML Template to Use**
+- **HTML Шаблон**
 ```
 <section id="achievements">
     <h2>Достижения</h2>
@@ -156,7 +156,7 @@ The results should be provided in html format, Provide only the html code for th
 """
 
 prompt_certifications_template = """
-- **HTML Template to Use**
+- **HTML Шаблон**
 ```
 <section id="certifications">
     <h2>Сертификаты</h2>
@@ -170,7 +170,7 @@ The results should be provided in html format, Provide only the html code for th
 """
 
 prompt_additional_skills_template = """
-- **HTML Template to Use**
+- **HTML Шаблон**
 '''
 <section id="skills-languages">
     <h2>Дополнительные навыки</h2>

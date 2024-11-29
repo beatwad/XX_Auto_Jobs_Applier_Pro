@@ -174,10 +174,10 @@ section h2 {
   grid-column: 1;
 }
 
-#work-experience {
+#education {
   order: 1;
 }
-#education {
+#work-experience {
   order: 2;
 }
 #achievements {
@@ -186,6 +186,9 @@ section h2 {
 #side-projects {
   order: 4;
 }
-#skills-languages {
+#certifications {
   order: 5;
+}
+#skills-languages {
+  order: 6;
 }

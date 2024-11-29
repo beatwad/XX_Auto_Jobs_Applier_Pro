@@ -1,6 +1,5 @@
 import os
 import re
-import tempfile
 import traceback
 import textwrap
 import time
@@ -886,7 +885,6 @@ class GPTResumeGenerator:
         
         output = chain.invoke({
             "languages": self.resume["languages"],
-            "interests": self.resume["interests"],
             "skills": self.resume["skills"],
             "job_description": self.job_description,
             "sex": sex
@@ -969,5 +967,4 @@ class GPTResumeGenerator:
         full_resume += f"    {results.get('additional_skills', '')}\n"
         full_resume += "  </main>\n"
         full_resume += "</body>"
-        # full_resume = self.rewrite_html_resume(full_resume)
         return full_resume

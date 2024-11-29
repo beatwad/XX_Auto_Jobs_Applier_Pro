@@ -1,6 +1,5 @@
 from typing import Any
 from string import Template
-from typing import Any
 
 class ResumeGenerator:
     """Класс для генерации резюме"""
@@ -35,6 +34,7 @@ class ResumeGenerator:
     def _create_resume(self, gpt_resume_generator: Any, style_path, temp_html_path):
         """Вспомогательный метод для генерации резюме"""
         template = Template(self.html_template)
-        message = template.substitute(markdown=gpt_resume_generator.generate_html_resume(), style_path=style_path)
+        html_resume = gpt_resume_generator.generate_html_resume()
+        message = template.substitute(markdown=html_resume, style_path=style_path)
         with open(temp_html_path, 'w', encoding='utf-8') as temp_file:
             temp_file.write(message)

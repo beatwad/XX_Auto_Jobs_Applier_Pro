@@ -31,19 +31,19 @@ def HTML_to_PDF(FilePath):
         driver.get(FilePath)
         time.sleep(2)
         pdf_base64 = driver.execute_cdp_cmd("Page.printToPDF", {
-            "printBackground": True,          # Include lo sfondo nella stampa
-            "landscape": False,               # Stampa in verticale (False per ritratto)
-            "paperWidth": 8.27,               # Larghezza del foglio in pollici (A4)
-            "paperHeight": 11.69,             # Altezza del foglio in pollici (A4)
-            "marginTop": 0.8,                 # Margine superiore in pollici (circa 2 cm)
-            "marginBottom": 0.8,              # Margine inferiore in pollici (circa 2 cm)
-            "marginLeft": 0.5,                # Margine sinistro in pollici (circa 2 cm)
-            "marginRight": 0.5,               # Margine destro in pollici (circa 2 cm)
-            "displayHeaderFooter": False,     # Non visualizzare intestazioni e piè di pagina
-            "preferCSSPageSize": True,        # Preferire le dimensioni della pagina CSS
-            "generateDocumentOutline": False, # Non generare un sommario del documento
-            "generateTaggedPDF": False,       # Non generare PDF taggato
-            "transferMode": "ReturnAsBase64"  # Restituire il PDF come stringa base64
+            "printBackground": True,          # Включить фон при печати
+            "landscape": False,               # Печатать в вертикальной ориентации (False для портретной ориентации)
+            "paperWidth": 8.27,               # Ширина листа в дюймах (A4)
+            "paperHeight": 11.69,             # Высота листа в дюймах (A4)
+            "marginTop": 0.8,                 # Верхнее поле в дюймах 
+            "marginBottom": 0.8,              # Нижнее поле в дюймах
+            "marginLeft": 0.5,                # Левое поле в дюймах
+            "marginRight": 0.5,               # Правое поле в дюймах
+            "displayHeaderFooter": False,     # Не отображать заголовки и нижние колонтитулы
+            "preferCSSPageSize": True,        # Использовать размеры страницы из CSS
+            "generateDocumentOutline": False, # Не генерировать оглавление документа
+            "generateTaggedPDF": False,       # Не генерировать тэгированный PDF
+            "transferMode": "ReturnAsBase64"  # Вернуть PDF в виде строки base64
         })
         return pdf_base64['data']
     except WebDriverException as e:

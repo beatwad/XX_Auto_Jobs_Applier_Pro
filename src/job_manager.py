@@ -542,7 +542,7 @@ class JobManager:
                 logger.debug(f"Generated file path for resume: {file_path_pdf}")
                 logger.debug(f"Generating resume for job: {job_title} at {job['company_name']}")
                 resume_pdf_base64 = self.resume_generator_manager.pdf_base64(self.gpt_resume_generator, job)
-                with open(file_path_pdf, "xb") as f:
+                with open(file_path_pdf, "wb") as f:
                     f.write(base64.b64decode(resume_pdf_base64))
                 logger.debug(f"Resume successfully generated and saved to: {file_path_pdf}")
 
