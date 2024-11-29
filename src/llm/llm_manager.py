@@ -420,10 +420,12 @@ class GPTAnswerer:
             "job_is_interesting": self._create_chain(prompts.job_is_interesting),
         }
 
+
     @property
     def job_description(self) -> Dict[str, str]:
         """Возвращает описание вакансии."""
         return self.job["description"]
+
 
     @staticmethod
     def find_best_match(text: str, options: list[str]) -> str:
@@ -439,11 +441,13 @@ class GPTAnswerer:
         logger.debug(f"Лучшее совпадение найдено: {best_option}")
         return best_option
 
+
     @staticmethod
     def _remove_placeholders(text: str) -> str:
         """Удаляем все заполнители 'PLACEHOLDER' из текста."""
         logger.debug(f"Удаление заполнителей из текста: {text}")
         return text.replace("PLACEHOLDER", "").strip()
+
 
     @staticmethod
     def _preprocess_template_string(template: str) -> str:
@@ -451,16 +455,19 @@ class GPTAnswerer:
         logger.debug("Предобработка строки шаблона")
         return textwrap.dedent(template)
 
+
     def set_resume(self, resume) -> None:
         """Добавляем резюме для анализа."""
         logger.debug(f"Добавляем резюме: {resume}")
         self.resume = resume
+
 
     def set_job(self, job) -> None:
         """Добавляем описание вакансии."""
         logger.debug(f"Добавляем описание вакансии: {job}")
         self.job = job
         # self.job["summarize_job_description"] = self.summarize_job_description(self.job["description"])
+
 
     def summarize_job_description(self, text: str) -> str:
         """Создаем краткое описание вакансии"""
@@ -474,11 +481,13 @@ class GPTAnswerer:
         logger.debug(f"Сгенерировано краткое описание: {output}")
         return output
 
+
     def _create_chain(self, template: str) -> ChatPromptTemplate:
         """Создаем цепочку обработки для конкретного раздела резюме."""
         logger.debug(f"Создание цепочки с шаблоном: '{template}'")
         prompt = ChatPromptTemplate.from_template(template)
         return prompt | self.llm_cheap | StrOutputParser()
+
 
     def answer_question_textual_wide_range(self, question: str) -> str:
         """Определить тему заданного вопроса и ответить на него"""
@@ -611,6 +620,7 @@ class GPTAnswerer:
         logger.debug(f"Ответ на вопрос: {output}")
         return output
     
+
     def select_one_answer_from_options(self, question: str, options: list[str]) -> str:
         """
         Спрашиваем у LLM ответ на вопрос с несколькими 
@@ -628,6 +638,7 @@ class GPTAnswerer:
         logger.debug(f"Лучший вариант ответа найден: {best_option}")
         return best_option
     
+
     def select_many_answers_from_options(self, question: str, options: list[str]) -> List[str]:
         """
         Спрашиваем у LLM ответ на вопрос с одним или несколькими 
@@ -652,6 +663,7 @@ class GPTAnswerer:
         logger.debug(f"Лучшие варианты ответа: {best_options}")
         return best_options
     
+
     def job_is_interesting(self) -> bool|None:
         """
         Спрашиваем у LLM, может ли быть интересна 
@@ -683,6 +695,7 @@ class GPTAnswerer:
             return False
         return True
     
+
     def write_cover_letter(self) -> str:
         """
         В зависимости от настроек создаем сопроводительное письмо на основе резюме и описания вакансии.
@@ -705,67 +718,17 @@ class GPTResumeGenerator:
         self.llm_cheap = LoggerChatModel(self.ai_adapter)
         self.llm_embeddings = OpenAIEmbeddings(openai_api_key=llm_api_key)
 
+
     @staticmethod
     def _preprocess_template_string(template: str) -> str:
         """Предобработка строки с целью убрать лишние отступы"""
         return textwrap.dedent(template)
 
+
     def set_resume(self, resume):
         """Добавляем резюме для анализа."""
         self.resume = resume
 
-    def set_job_description_from_url(self, url_job_description):
-        """Получаем описание работы из URL"""
-        from src.resume_builder.utils import create_driver_selenium
-        driver = create_driver_selenium()
-        driver.get(url_job_description)
-        time.sleep(3)
-        body_element = driver.find_element("tag name", "body")
-        response = body_element.get_attribute("outerHTML")
-        driver.quit()
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".html", mode="w", encoding="utf-8") as temp_file:
-            temp_file.write(response)
-            temp_file_path = temp_file.name
-        try:
-            loader = TextLoader(temp_file_path, encoding="utf-8", autodetect_encoding=True)
-            document = loader.load()
-        finally:
-            os.remove(temp_file_path)
-        text_splitter = TokenTextSplitter(chunk_size=500, chunk_overlap=50)
-        all_splits = text_splitter.split_documents(document)
-        vectorstore = FAISS.from_documents(documents=all_splits, embedding=self.llm_embeddings)
-        prompt = PromptTemplate(
-            template="""
-            You are an expert job description analyst. Your role is to meticulously analyze and interpret job descriptions. 
-            After analyzing the job description, answer the following question in a clear, and informative manner.
-            
-            Question: {question}
-            Job Description: {context}
-            Answer:
-            """,
-            input_variables=["question", "context"]
-        )
-        
-        def format_docs(docs):
-            return "\n\n".join(doc.page_content for doc in docs)
-        
-        context_formatter = vectorstore.as_retriever() | format_docs
-        question_passthrough = RunnablePassthrough()
-        chain_job_descroption= prompt | self.llm_cheap | StrOutputParser()
-        summarize_prompt_template = self._preprocess_template_string(prompts.summarize_prompt_template)
-        prompt_summarize = ChatPromptTemplate.from_template(summarize_prompt_template)
-        chain_summarize = prompt_summarize | self.llm_cheap | StrOutputParser()
-        qa_chain = (
-            {
-                "context": context_formatter,
-                "question": question_passthrough,
-            }
-            | chain_job_descroption
-            | (lambda output: {"text": output})
-            | chain_summarize
-        )
-        result = qa_chain.invoke("Provide full job description")
-        self.job_description = result
 
     def set_job_description_from_text(self, job_description_text):
         """Резюмируем описание вакансии"""
@@ -777,6 +740,7 @@ class GPTResumeGenerator:
         logger.debug("Краткое описание вакансии сгенерировано")
         self.job_description = output
     
+
     def generate_header(self) -> str:
         """Генерация заголовка резюме"""
         logger.debug("Генерация заголовка резюме")
@@ -796,6 +760,7 @@ class GPTResumeGenerator:
         logger.debug("Заголовок резюме сгенерирован")
         return output
 
+
     def generate_education_section(self) -> str:
         """Генерация раздела образования для резюме"""
         logger.debug("Генерация раздела образования для резюме")
@@ -814,6 +779,7 @@ class GPTResumeGenerator:
         logger.debug("Раздел образования сгенерирован")
         return output
 
+
     def generate_work_experience_section(self) -> str:
         """Генерация раздела опыта для резюме"""
         logger.debug("Генерация раздела опыта для резюме")
@@ -831,6 +797,7 @@ class GPTResumeGenerator:
         logger.debug(f"Ответ от LLM: {output}")
         logger.debug("Раздел опыта сгенерирован")
         return output
+
 
     def generate_side_projects_section(self) -> str:
         """Генерация раздела проектов для резюме"""
@@ -853,6 +820,7 @@ class GPTResumeGenerator:
         logger.debug(f"Ответ от LLM: {output}")
         logger.debug("Раздел проектов сгенерирован")
         return output
+
 
     def generate_achievements_section(self) -> str:
         """Генерация раздела достижений для резюме"""
@@ -877,6 +845,7 @@ class GPTResumeGenerator:
         logger.debug(f"Ответ от LLM: {output}")
         logger.debug("Раздел достижений сгенерирован")
         return output
+
 
     def generate_certifications_section(self) -> str:
         """Генерация раздела сертификации для резюме"""
@@ -1000,4 +969,5 @@ class GPTResumeGenerator:
         full_resume += f"    {results.get('additional_skills', '')}\n"
         full_resume += "  </main>\n"
         full_resume += "</body>"
+        # full_resume = self.rewrite_html_resume(full_resume)
         return full_resume

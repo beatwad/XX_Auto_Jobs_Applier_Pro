@@ -84,10 +84,10 @@ h1 {
 }
 
 .contact-info p:nth-child(1)::before {
-  content: "address:";
+  content: "Адрес:";
 }
 .contact-info p:nth-child(2)::before {
-  content: "phone:";
+  content: "Телефон:";
 }
 .contact-info p:nth-child(3)::before {
   content: "email:";
